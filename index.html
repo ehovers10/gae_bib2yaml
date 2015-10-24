@@ -9,6 +9,7 @@
 	
     <!-- Bootstrap -->
     <link href="style/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -38,35 +39,37 @@
   <div id="wrap">
   <!-- Static navbar -->
 <div class="header">
-  <div class="navbar navbar-default navbar-static-top" role="navigation">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      </div><!--/.nav-header -->
-      <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="http://biomadeira.github.io/">Home</a></li>
-		  <li><a href="http://biomadeira.github.io/research.html">Research</a></li>
-		  <li><a href="http://biomadeira.github.io/blog.html">Blog</a></li>
-		  <li><a href="http://biomadeira.github.io/music.html">Music</a></li>
-        </ul>
-      </div><!--/.nav-collapse -->
-    </div><!--/.container -->
-  </div><!--/.navbar-default -->
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+	      <div class="navbar-header">
+	        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	          <span class="sr-only">Toggle navigation</span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </button>
+	      </div><!--/.nav-header -->
+	      <div class="navbar-collapse collapse">
+	        <ul class="nav navbar-nav navbar-right">
+	          <li><a href="http://biomadeira.github.io/">Home</a></li>
+			  <li><a class="fa fa-github"
+                       href="http://www.github.com/biomadeira"></a></li>
+			  <li><a class="fa fa-twitter"
+                       href="http://www.twitter.com/@biomadeira"></a></li>
+	        </ul>
+	      </div><!--/.nav-collapse -->
+	    </div><!--/.container -->
+	  </div><!--/.navbar-default -->
 </div><!-- /.header -->
     <div class="container">
   </br></br>
-  <h3><a href="http://www.bibtex.org/" target="_new">BibTeX</a> to <a href="http://yaml.org" target="_new">YAML</a> = <a href="https://github.com/fmadeira/bibyaml" target="_new">BibYAML</a></h3>
+  <h3><a href="http://www.bibtex.org/">BibTeX</a> to <a href="http://yaml.org">YAML</a> = 
+	  <a href="https://github.com/biomadeira/gae_bib2yaml">BibYAML</a></h3>
   <div class='form'>
     <div id='bibtex'>
       <form method="POST" action="/">
         <p></p>
-        <textarea id="bib" class="bib" name="bib" rows="16" cols="97">{{ bibtex }}</textarea>
+        <textarea id="bib" class="bib" name="bib" rows="18" cols="120">{{ bibtex }}</textarea>
       </form>
     </div>
 	<p></p>
@@ -82,9 +85,12 @@
   <!-- FOOTER -->
 <div id="footer">
     <div class="container">
-      <p class="text-muted">This website uses <a href='http://getbootstrap.com/' class="nounderline">Bootstrap</a>, is built with <a
-href='https://github.com/mojombo/jekyll'>Jekyll</a>, and hosted by <a
-href='http://pages.github.com/'>GitHub pages</a>. Contents under the
+      <p class="text-muted">
+		  Designed by  
+		  		  <a href='http://biomadeira.github.io/' class="nounderline">Fábio Madeira</a> and proudly
+		  hosted in 
+		  <a href='https://cloud.google.com/appengine/' class="nounderline">Google App Engine</a>.</br> 
+		  Contents under the
 <a href='http://creativecommons.org/licenses/by-sa/3.0/deed.en_US'>CC
 BY-SA 3.0</a> licence.</p>
     </div><!-- /.container -->
