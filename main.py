@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2007 Google Inc.
+# Copyright 2012 Fabio Madeira.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,106 +15,95 @@
 # limitations under the License.
 #
 
-project = 'BibYAML'
-url = 'https://github.com/biomadeira/bibyaml'
+project = 'Bib2YAML'
+url = 'https://github.com/biomadeira/gae_bib2yaml'
 author = 'F. Madeira'
-date = 'July, 2012'
+created = 'July, 2012'
 version = 'beta'
-license = 'See License on https://github.com/biomadeira/bibyaml'
+license = 'See License @url'
 
 import os
 import simplejson
+import json
 import webapp2
 import wsgiref.handlers
+from bibpy.bib import Parser
+from collections import OrderedDict
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 
 default_bibtex = """
-@Article{journals/aim/Sloman99,
-  title =	"Review of Affective Computing",
-  author =	"Aaron Sloman",
-  journal =	"AI Magazine",
-  year = 	"1999",
-  number =	"1",
-  volume =	"20",
-  url =	"http://dblp.uni-trier.de/db/journals/aim/aim20.html#Sloman99",
-  pages =	"127--133",
+@article{ berger2003,
+    author = {Berger, Jean and Barkaoui, Mohamed},
+    issn = {0160-5682},
+    journal = {Journal of the Operational Research Society},
+    number = {12},
+    pages = {1254--1262},
+    publisher = {Nature Publishing Group},
+    title = {{A new hybrid genetic algorithm for the capacitated vehicle routing problem}},
+    url = {http://www.palgrave-journals.com/jors/journal/v54/n12/abs/2601635a.html},
+    volume = {54},
+    year = {2003}
 }
 
-@Book{picard:1997a,
-  author =	"Rosalind W. Picard",
-  title =	"Affective Computing",
-  publisher =	"The {MIT} Press",
-  year = 	"1997",
-  address =	"Cambridge, Massachusetts",
-  ISBN = 	"0-262-16170-2",
-}
-
-@Article{journals/aim/Picard99,
-  title =	"Response to Sloman's Review of Affective Computing",
-  author =	"Rosalind W. Picard",
-  journal =	"AI Magazine",
-  year = 	"1999",
-  number =	"1",
-  volume =	"20",
-  url =	"http://dblp.uni-trier.de/db/journals/aim/aim20.html#Picard99",
-  pages =	"134--137",
-}
+@book{ aaker:1981a,
+    author = {David A. Aaker},
+    title = {Multivariate Analysis in Marketing},
+    edition = {2},
+    publisher = {The Scientific Press},
+    year = {1981},
+    address = {Palo Alto},
+    topic = {multivariate-statistics;market-research;}
+ }
 """
 
-def bibtex2bibyaml(entry):
-    "The most naive BibTeX parser in the world."
-    ref = ""
-    try:
-        new_entry = ''	
-        for char in entry:
-            if '\n' not in char:
-                new_entry += char			
-        bib = new_entry.split(',')
-        type = bib[0].split('{')
-        type = type[0]
-        type = type.rstrip()
-        type = type.lstrip()
-        name = bib[0].split('{')
-        name = name[1].rstrip('\n')
-        name = name.rstrip()
-        name = name.lstrip()
-        ref = "%s:\n    - name: %s\n" %(type, name )
-        for i in range(1,len(bib)-1):
-            value = bib[i].split('=')
-            left = value[0].lstrip()
-            left = left.rstrip()
-            right = value[1].rstrip(',')
-            right = right.lstrip()
-            right = right.rstrip('}')
-            right = right.strip('  {}""')
-            right = right.rstrip()
-            right = right.lstrip()
-            ref += "    %s: %s\n" %(left, right)
-    except: pass
-    return ref
+def output_bibyaml(bib):
+    "Outputs BibYAML"
+    
+    bibyaml = ""
+    for ent in bib["items"]:
+        head = ent["type"]
+        body = ""
+        for k in ent:
+            value = ent[k]
+            try:
+                value = value.replace(" ,", ",")
+            except AttributeError:
+                pass
+            if k == "type":
+                continue
+            if isinstance(ent[k], list):
+                for e in ent[k]:
+                     value = ", ".join(e.values())
+            if isinstance(ent[k], dict):
+                value = ", ".join(ent[k].values())
 
-def getOutput(bib) :
-    try :
-        out = ""
-        entries = bib.split('@')
-        entries.pop(0)
-        for entry in entries:
-            processed = bibtex2bibyaml(entry)
-            out += processed + '\n'
-        return out
-    except Exception, why :
-        return "ERROR:\n\n" + str(why)
+            body += "\t{}: {}\n".format(k, value)
+        bibyaml += "{}:\n{}\n".format(head, body)
+
+    return bibyaml
+
+
+def parse_bibtex(bib):
+    "Parses Bibtex with bibpy"
+    
+    data = Parser(bib)
+    data.parse()
+    bib = json.loads(data.json(),  object_pairs_hook=OrderedDict)
+    print bib
+    return bib
+
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        bib = self.request.get("bibtex", default_bibtex)
-        output = getOutput(bib)
+        bibtex = self.request.get("bibtex", default_bibtex)
+        bibjson = parse_bibtex(bibtex)
+        bibyaml = output_bibyaml(bibjson)
 
         template_values = {}
-        template_values['output'] = output
-        template_values['bibtex'] = bib
+        template_values['output'] = bibyaml
+        template_values['bibtex'] = bibtex
 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
@@ -122,12 +111,14 @@ class MainHandler(webapp.RequestHandler):
     def post(self) :
         return self.get()
 
+
 class AjaxHandler(webapp.RequestHandler):
     def get(self):
-        bib = self.request.get("bibtex")
-        output = getOutput(bib)
+        bibtex = self.request.get("bibtex", default_bibtex)
+        bibjson = parse_bibtex(bibtex)
+        bibyaml = output_bibyaml(bibjson)
         
-        response = simplejson.dumps(output)
+        response = simplejson.dumps(bibyaml)
         cb = self.request.get("callback")
         if cb :
             response = cb + "(" + response + ")"
