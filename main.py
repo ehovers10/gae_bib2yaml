@@ -63,7 +63,7 @@ def output_bibyaml(bib):
     
     bibyaml = ""
     for ent in bib["items"]:
-        head = ent["type"]
+        head = "-"
         body = ""
         for k in ent:
             value = ent[k]
@@ -79,8 +79,8 @@ def output_bibyaml(bib):
             if isinstance(ent[k], dict):
                 value = ", ".join(ent[k].values())
 
-            body += "\t{}: {}\n".format(k, value)
-        bibyaml += "{}:\n{}\n".format(head, body)
+            body += "  {}: {}\n".format(k, value)
+        bibyaml += "{}\n{}\n".format(head, body)
 
     return bibyaml
 
